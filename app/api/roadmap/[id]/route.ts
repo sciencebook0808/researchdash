@@ -1,10 +1,15 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
   const body = await req.json()
+
   const step = await prisma.roadmapStep.update({
-    where: { id: params.id },
+    where: { id },
     data: {
       ...(body.status && { status: body.status }),
       ...(body.title && { title: body.title }),
@@ -12,10 +17,19 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     },
     include: { tasks: true }
   })
+
   return NextResponse.json(step)
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  await prisma.roadmapStep.delete({ where: { id: params.id } })
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+
+  await prisma.roadmapStep.delete({
+    where: { id }
+  })
+
   return NextResponse.json({ ok: true })
-}
+    }
