@@ -3,6 +3,8 @@ import Link from "next/link"
 import { BookOpen, ArrowRight, Tag } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+export const dynamic = "force-dynamic"
+
 export default async function DocsPage() {
   const pages = await prisma.documentationPage.findMany({
     orderBy: [{ section: "asc" }, { order: "asc" }],
