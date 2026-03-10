@@ -5,16 +5,10 @@ import Link from "next/link"
 import { ChevronLeft, Clock, Tag } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 
+export const dynamic = "force-dynamic"
+
 interface Props {
   params: Promise<{ slug: string }>
-}
-
-export async function generateStaticParams() {
-  const pages = await prisma.documentationPage.findMany({
-    select: { slug: true }
-  })
-
-  return pages.map((p) => ({ slug: p.slug }))
 }
 
 export default async function DocPage({ params }: Props) {
@@ -38,17 +32,19 @@ export default async function DocPage({ params }: Props) {
 
   return (
     <div className="max-w-4xl animate-fade-in">
-      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-[12px] text-muted-foreground mb-6">
-        <Link href="/docs" className="hover:text-amber-400 transition-colors flex items-center gap-1">
+        <Link
+          href="/docs"
+          className="hover:text-amber-400 transition-colors flex items-center gap-1"
+        >
           <ChevronLeft className="w-3.5 h-3.5" />
           Documentation
         </Link>
+
         <span>/</span>
         <span className="text-amber-400">{page.section}</span>
       </div>
 
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-foreground mb-3">
           {page.title}
@@ -74,12 +70,10 @@ export default async function DocPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Content */}
       <div className="rounded-xl border border-border bg-card p-8">
         <DocContent content={page.content} />
       </div>
 
-      {/* Navigation */}
       <div className="flex items-center justify-between mt-6 gap-4">
         {prev ? (
           <Link
