@@ -1,25 +1,68 @@
-import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { NextRequest, NextResponse } from "next/server"
+import { PrismaClient } from "@prisma/client"
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-  const body = await req.json()
-  const dataset = await prisma.dataset.update({
-    where: { id: params.id },
-    data: {
-      ...(body.name && { name: body.name }),
-      ...(body.description !== undefined && { description: body.description }),
-      ...(body.preprocessStatus && { preprocessStatus: body.preprocessStatus }),
-      ...(body.numSamples !== undefined && { numSamples: Number(body.numSamples) }),
-      ...(body.tags && { tags: body.tags }),
+const prisma = new PrismaClient()
+
+/**
+ * GET /api/datasets/[id]
+ * Fetch a dataset by ID
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+
+    const dataset = await prisma.dataset.findUnique({
+      where: { id }
+    })
+
+    if (!dataset) {
+      return NextResponse.json(
+        { error: "Dataset not found" },
+        { status: 404 }
+      )
     }
-  })
-  return NextResponse.json({
-    ...dataset,
-    sizeBytes: dataset.sizeBytes?.toString() ?? null,
-  })
+
+    return NextResponse.json(dataset)
+
+  } catch (error) {
+    console.error("Dataset GET error:", error)
+
+    return NextResponse.json(
+      { error: "Failed to fetch dataset" },
+      { status: 500 }
+    )
+  }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  await prisma.dataset.delete({ where: { id: params.id } })
-  return NextResponse.json({ ok: true })
-}
+/**
+ * DELETE /api/datasets/[id]
+ * Delete dataset
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+
+    await prisma.dataset.delete({
+      where: { id }
+    })
+
+    return NextResponse.json({
+      success: true,
+      message: "Dataset deleted successfully"
+    })
+
+  } catch (error) {
+    console.error("Dataset DELETE error:", error)
+
+    return NextResponse.json(
+      { error: "Failed to delete dataset" },
+      { status: 500 }
+    )
+  }
+  }
