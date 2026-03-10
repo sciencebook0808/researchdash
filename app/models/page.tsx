@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma"
-import { formatBytes, formatNumber, getStatusColor } from "@/lib/utils"
+import { formatBytes, formatNumber } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 import { Package, CheckCircle, BarChart3 } from "lucide-react"
+
+export const dynamic = "force-dynamic"
 
 export default async function ModelsPage() {
   const models = await prisma.modelVersion.findMany({
