@@ -7,6 +7,8 @@ import {
   CheckCircle2, Clock, Circle, Target, MemoryStick, Zap, GitBranch
 } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 async function getDashboardData() {
   const [roadmapSteps, datasets, experiments, models] = await Promise.all([
     prisma.roadmapStep.findMany({ include: { tasks: true } }),
